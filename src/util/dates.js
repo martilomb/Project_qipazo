@@ -23,6 +23,9 @@ export const isTimeZoneSupported = () => {
   return !!dtf.resolvedOptions().timeZone;
 };
 
+// This serves to define the length of the time slot, it goes into the function later.
+const timeSlotMinutes = 90;
+
 /**
  * Detect the default timezone of user's browser.
  * This function can only be called from client side.
@@ -658,14 +661,14 @@ export const getSharpHours = (startTime, endTime, timeZone, intl) => {
   // I.e. startTime might be a sharp hour.
   const millisecondBeforeStartTime = new Date(startTime.getTime() - 1);
   return findBookingUnitBoundaries({
-    currentBoundary: findNextBoundary(millisecondBeforeStartTime, 'hour', timeZone),
+    currentBoundary: findNextCustomBoundary(millisecondBeforeStartTime, 'minutes', timeZone),
     startMoment: moment(startTime),
     endMoment: moment(endTime),
-    nextBoundaryFn: findNextBoundary,
+    nextBoundaryFn: findNextCustomBoundary,
     cumulatedResults: [],
     intl,
     timeZone,
-    timeUnit: 'hour',
+    timeUnit: 'minutes',
   });
 };
 
@@ -688,6 +691,7 @@ export const getSharpHours = (startTime, endTime, timeZone, intl) => {
  *      "timeOfDay": "13:00",
  *    },
  *  ]
+ * 
  *
  * @param {Date} Start point of available time window.
  * @param {Date} End point of available time window.
@@ -700,6 +704,38 @@ export const getStartHours = (startTime, endTime, timeZone, intl) => {
   const hours = getSharpHours(startTime, endTime, timeZone, intl);
   return hours.length < 2 ? hours : hours.slice(0, -1);
 };
+
+/**
+ * Rounding function for moment.js. Rounds the Moment provided by the context
+ * to the start of the specified time value in the specified units.
+ * @param {*} value the rounding value
+ * @param {*} timeUnit time units to specify the value
+ * @returns Moment rounded to the start of the specified time value
+ */
+moment.fn.startOfDuration = function(value, timeUnit) {
+  const getMs = (val, unit) =>
+    moment.duration(val, unit).asMilliseconds();
+  const ms = getMs(value, timeUnit);
+
+  // Get UTC offset to account for potential time zone difference between
+  // customer and listing
+  const offsetMs = this._isUTC ? 0 : getMs(this.utcOffset(), 'minute');
+  return moment(Math.floor((this.valueOf() + offsetMs) / ms) * ms);
+};
+
+export const findNextCustomBoundary = (
+  currentMomentOrDate,
+  timeUnit,
+  timeZone
+) => {
+  return moment(currentMomentOrDate)
+    .clone()
+    .tz(timeZone)
+    .add(timeSlotMinutes, timeUnit)
+    .startOfDuration(timeSlotMinutes, timeUnit)
+    .toDate();
+};
+
 
 /**
  * Find sharp end hours for bookable time units (hour) inside given time window.
