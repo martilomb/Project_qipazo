@@ -82,6 +82,22 @@ const getAvailableEndTimes = (
     return [];
   }
 
+  const seatsArray =
+  Array(selectedTimeSlot?.attributes.seats)
+    .fill()
+    .map((_, i) => i + 1) || null;
+
+const seatsSelectionMaybe =
+  seatsArray?.length > 1 ? (
+    <FieldSelect name="seats" id="seats" label={seatsLabel}>
+      {seatsArray.map(s => (
+        <option value={s} key={s}>
+          {s}
+        </option>
+      ))}
+    </FieldSelect>
+  ) : null;
+
   const endDate = selectedTimeSlot.attributes.end;
   const bookingStartTimeAsDate = timestampToDate(bookingStartTime);
 
@@ -548,6 +564,7 @@ class FieldDateAndTimeInput extends Component {
             </FieldSelect>
           </div>
         </div>
+        {seatsSelectionMaybe}
       </div>
     );
   }
