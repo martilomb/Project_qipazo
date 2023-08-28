@@ -82,21 +82,7 @@ const getAvailableEndTimes = (
     return [];
   }
 
-  const seatsArray =
-  Array(selectedTimeSlot?.attributes.seats)
-    .fill()
-    .map((_, i) => i + 1) || null;
-
-const seatsSelectionMaybe =
-  seatsArray?.length > 1 ? (
-    <FieldSelect name="seats" id="seats" label={seatsLabel}>
-      {seatsArray.map(s => (
-        <option value={s} key={s}>
-          {s}
-        </option>
-      ))}
-    </FieldSelect>
-  ) : null;
+  
 
   const endDate = selectedTimeSlot.attributes.end;
   const bookingStartTimeAsDate = timestampToDate(bookingStartTime);
@@ -191,7 +177,8 @@ const getAllTimeValues = (
       ? endTimes[0].timestamp.toString()
       : null;
 
-  return { startTime, endDate, endTime, selectedTimeSlot };
+return { startTime, endDate, endTime, selectedTimeSlot };
+  
 };
 
 const getMonthlyTimeSlots = (monthlyTimeSlots, date, timeZone) => {
@@ -231,6 +218,22 @@ const Prev = props => {
 
   return isDateSameOrAfter(prevMonthDate, currentMonthDate) ? <PrevIcon /> : null;
 };
+
+const seatsArray =
+    Array(getAllTimeValues.selectedTimeSlot?.attributes.seats)
+      .fill()
+      .map((_, i) => i + 1) || null;
+
+const seatsSelectionMaybe =
+  seatsArray?.length > 1 ? (
+    <FieldSelect name="seats" id="seats" label={seatsLabel}>
+      {seatsArray.map(s => (
+        <option value={s} key={s}>
+          {s}
+        </option>
+      ))}
+    </FieldSelect>
+  ) : null;
 
 /////////////////////////////////////
 // FieldDateAndTimeInput component //
