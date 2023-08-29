@@ -219,21 +219,7 @@ const Prev = props => {
   return isDateSameOrAfter(prevMonthDate, currentMonthDate) ? <PrevIcon /> : null;
 };
 
-const seatsArray =
-    Array(getAllTimeValues.selectedTimeSlot?.attributes.seats)
-      .fill()
-      .map((_, i) => i + 1) || null;
 
-const seatsSelectionMaybe =
-  seatsArray?.length > 1 ? (
-    <FieldSelect name="seats" id="seats" label={seatsLabel}>
-      {seatsArray.map(s => (
-        <option value={s} key={s}>
-          {s}
-        </option>
-      ))}
-    </FieldSelect>
-  ) : null;
 
 /////////////////////////////////////
 // FieldDateAndTimeInput component //
@@ -414,6 +400,7 @@ class FieldDateAndTimeInput extends Component {
       timeZone,
       intl,
       dayCountAvailableForBooking,
+      seatsLabel
     } = this.props;
 
     const classes = classNames(rootClassName || css.root, className);
@@ -475,11 +462,30 @@ class FieldDateAndTimeInput extends Component {
             )
           )
       : () => false;
+    
+    const seatsArray =
+      Array(selectedTimeSlot?.attributes.seats)
+        .fill()
+        .map((_, i) => i + 1) || null;
+
+    const seatsSelectionMaybe =
+      seatsArray?.length > 1 ? (
+        <FieldSelect name="seats" id="seats" label={seatsLabel}>
+          {seatsArray.map(s => (
+            <option value={s} key={s}>
+              {s}
+            </option>
+          ))}
+        </FieldSelect>
+      ) : null;
 
     const nextBoundary = findNextBoundary(TODAY, 'hour', timeZone);
     const placeholderTime = formatDateIntoPartials(nextBoundary, intl, { timeZone })?.time;
     const startOfToday = getStartOf(TODAY, 'day', timeZone);
     const bookingEndTimeAvailable = bookingStartDate && (bookingStartTime || startTime);
+    
+    
+
     return (
       <div className={classes}>
         <div className={css.formRow}>
