@@ -400,7 +400,7 @@ class FieldDateAndTimeInput extends Component {
       timeZone,
       intl,
       dayCountAvailableForBooking,
-      seatsLabel
+      seatsLabel,
     } = this.props;
 
     const classes = classNames(rootClassName || css.root, className);

@@ -65,6 +65,8 @@ export class BookingTimeFormComponent extends Component {
       price: unitPrice,
       dayCountAvailableForBooking,
       marketplaceName,
+      seatsArray,
+      seatsLabel,
       ...rest
     } = this.props;
     const classes = classNames(rootClassName || css.root, className);

@@ -59,20 +59,7 @@ const getItemQuantityAndLineItems = (orderData, publicData, currency) => {
   return { quantity, extraLineItems: deliveryLineItem };
 };
 
-/**
- * Get quantity for arbitrary units and seats for time-based bookings.
- *
- * @param {*} orderData should contain quantity
- */
-const getHourUnitsSeatsAndLineItems = orderData => {
-  const { bookingStart, bookingEnd, seats } = orderData || {};
-  const units =
-    bookingStart && bookingEnd
-      ? calculateQuantityFromHours(bookingStart, bookingEnd)
-      : null;
 
-  return { units, seats, extraLineItems: [] };
-};
 
 /**
  * Get quantity for arbitrary units for time-based bookings.
@@ -119,6 +106,20 @@ const getDateRangeUnitsSeatsLineItems = (orderData, code) => {
   return { units, seats, extraLineItems: [] };
 };
 
+/**
+ * Get quantity for arbitrary units and seats for time-based bookings.
+ *
+ * @param {*} orderData should contain quantity
+ */
+const getHourUnitsSeatsAndLineItems = orderData => {
+  const { bookingStart, bookingEnd, seats } = orderData || {};
+  const units =
+    bookingStart && bookingEnd
+      ? calculateQuantityFromHours(bookingStart, bookingEnd)
+      : null;
+
+  return { units, seats, extraLineItems: [] };
+};
 
 
 /**
@@ -173,7 +174,9 @@ exports.transactionLineItems = (listing, orderData, providerCommission) => {
   const quantityAndExtraLineItems =
     unitType === 'item'
       ? getItemQuantityAndLineItems(orderData, publicData, currency)
-      : unitType === 'hour'
+      : (unitType === 'hour') && !!orderData.seats //last part added as test
+      ? getHourUnitsSeatsAndLineItems(orderData)
+      : unitType === 'hour' 
       ? getHourQuantityAndLineItems(orderData)
       : ['day', 'night'].includes(unitType) && !!orderData.seats
       ? getDateRangeUnitsSeatsLineItems(orderData, code)
@@ -181,7 +184,7 @@ exports.transactionLineItems = (listing, orderData, providerCommission) => {
       ? getDateRangeQuantityAndLineItems(orderData, code)
       : {};
 
-      const { quantity, units, seats, extraLineItems } = quantityAndExtraLineItems;
+  const { quantity, units, seats, extraLineItems } = quantityAndExtraLineItems;
 
   // Throw error if there is no quantity information given
   if (!quantity && !(units && seats)) {

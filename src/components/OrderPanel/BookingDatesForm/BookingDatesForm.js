@@ -519,28 +519,7 @@ export const BookingDatesFormComponent = props => {
     onFetchTransactionLineItems
   );
   
-  const getSeatsArray = () => {
-    const formState = formApi.getState();
-    const { bookingDates } = formState.values;
   
-    if (!bookingDates) {
-      return null;
-    }
-  
-    const minSeatsTimeSlot = getMinSeatsTimeSlot(
-      monthlyTimeSlots,
-      timeZone,
-      bookingDates.startDate,
-      bookingDates.endDate
-    );
-  
-    // Return an array of the seat options a customer
-    // can pick for the time range
-    return Array(minSeatsTimeSlot.seats)
-      .fill()
-      .map((_, i) => i + 1);
-  };
-
   return (
     <FinalForm
       {...rest}
@@ -625,7 +604,28 @@ export const BookingDatesFormComponent = props => {
           timeZone
         );
         
+        const getSeatsArray = () => {
+          const formState = formApi.getState();
+          const { bookingDates } = formState.values;
         
+          if (!bookingDates) {
+            return null;
+          }
+        
+          const minSeatsTimeSlot = getMinSeatsTimeSlot(
+            monthlyTimeSlots,
+            timeZone,
+            bookingDates.startDate,
+            bookingDates.endDate
+          );
+        
+          // Return an array of the seat options a customer
+          // can pick for the time range
+          return Array(minSeatsTimeSlot.seats)
+            .fill()
+            .map((_, i) => i + 1);
+        };
+      
 
         return (
           <Form onSubmit={handleSubmit} className={classes} enforcePagePreloadFor="CheckoutPage">
