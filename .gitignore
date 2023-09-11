@@ -12,5 +12,10 @@ build
 # misc
 .DS_Store
 .env
+.yarn
 npm-debug.log
 yarn-error.log
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
+.gitignore
